@@ -19,6 +19,12 @@ from lib.model.stereo_rcnn.resnet import resnet
 import triangulation as tri
 import calibration
 
+from stereo_calibration import StereoManager, CameraParameters, StereoParameters
+
+sm = StereoManager()
+sm.load_calibration("/Users/aashi/Documents/stereoMaps/stereoMap_padding_4.pickle")
+
+
 ####################### GPU ###########################
 print(torch.cuda.is_available())
 
@@ -67,7 +73,7 @@ if __name__ == '__main__':
     input_dir = args.load_dir + "/"
     if not os.path.exists(input_dir):
         raise Exception('There is no input directory for loading network from ' + input_dir)
-    load_name = os.path.join(input_dir, 'stereo_rcnn_epoch_140_loss_-45.71171951293945.pth')  # stereo_rcnn_epoch_105_loss_-35.623756408691406.pth
+    load_name = os.path.join(input_dir, 'stereo_rcnn_epoch_140_loss_-37.260189056396484.pth')  # stereo_rcnn_epoch_105_loss_-35.623756408691406.pth
 
     kitti_classes = np.asarray(['__background__', 'Car'])
 
@@ -273,20 +279,28 @@ if __name__ == '__main__':
                 im2show_right = cv2.rectangle(im2show_right, r_bbox[0:2], r_bbox[2:4], color, 5)
 
                 # Find mid point in left box
-                left_key = np.array(
+                mid_left = np.array(
                     [l_bbox[0] + int((l_bbox[2] - l_bbox[0]) / 2), l_bbox[1] + int((l_bbox[3] - l_bbox[1]) / 2)],
                     dtype=np.int)
                 # Find mid point in right box
-                right_key = np.array(
+                mid_right = np.array(
                     [r_bbox[0] + int((r_bbox[2] - r_bbox[0]) / 2), r_bbox[1] + int((r_bbox[3] - r_bbox[1]) / 2)],
                     dtype=np.int)
 
-                det_l = np.vstack((det_l, left_key))
-                det_r = np.vstack((det_r, right_key))
+                det_l = np.vstack((det_l, mid_left))
+                det_r = np.vstack((det_r, mid_right))
 
-                sl_key = np.array([left_key], dtype=np.float32)
-                sr_key = np.array([right_key], dtype=np.float32)
+                sl_key = np.array([mid_left], dtype=np.float32)
+                sr_key = np.array([mid_right], dtype=np.float32)
 
+                xyz = sm.stereopixel_to_real(sl_key, sr_key)
+
+                print("---------------------------------------------------------", sl_key, sr_key)
+
+                print("xyz: ", xyz)
+
+
+                '''
                 # Stereo camera setup parameters
                 baseline = 122     # Distance between cameras [cm]
                # f = 1.8             # Camera lens focal length [mm]
@@ -300,8 +314,8 @@ if __name__ == '__main__':
                     right_x = right_x_y[0]
                     # Left y-coordinate of midpoint keypoints (origin: bottom left corner)
                     #left_y = 720 - left_x_y[1]  # TODO 642 - left_x_y[1]    (720 when zero offset)
-
-                    '''
+                '''
+                '''
                     ####################################################################################
                     # disparity, baseline and focal length
                     disparity = left_x - right_x  #right_x - left_x
@@ -316,18 +330,20 @@ if __name__ == '__main__':
                     # z-coordinate Depth = f*b/disparity
                     depth = (focal_length * baseline) / (disparity * pixel_size)
                     ####################################################################################
-                    '''
+                '''
 
 
-                    depth = tri.find_depth(right_x, left_x, img_right, img_left, baseline, alpha)
-                    x_coord = tri.find_x(left_x, right_x, left_x_y, baseline)
-                    y_coord = tri.find_y(left_x, right_x, left_x_y, baseline, img_right)
+                    #depth = tri.find_depth(right_x, left_x, img_right, img_left, baseline, alpha)
+                    #x_coord = tri.find_x(left_x, right_x, left_x_y, baseline)
+                    #y_coord = tri.find_y(left_x, right_x, left_x_y, baseline, img_right)
 
 
 
-                print("depth: ", str(depth))
-                print("x-coordinate: ", str(x_coord))
-                print("y-coordinate: ", str(y_coord))
+
+
+                #print("depth: ", str(depth))
+                #print("x-coordinate: ", str(x_coord))
+                #print("y-coordinate: ", str(y_coord))
 
 
 
