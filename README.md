@@ -4,9 +4,23 @@
  - annotator.py
 
 #### Dataset
-- 1000 stereo image pairs
+- training dataset: Stereo_RCNN/data/training_data
+- testing dataset: Stereo_RCNN/data/testing_data
 
-#### Stereo R-CNN
-- Train network: trainval_net.py
-- Google Colab: setup_train_Stereo_RCNN.ipynb
-- Visualize detections: demo.py
+
+#### Stereo camera calibration
+- stereo_calibration.py
+
+#### Training Stereo R-CNN
+- trainval_net.py
+- With Google Colab: setup_train_Stereo_RCNN.ipynb
+
+#### Evaluation of trained Stereo R-CNN model
+- test_model.py
+
+#### 3D position estimation of detected objects
+- 3D_pos_detections.py 
+
+#### Tracking objects with estimation of velocity and acceleration
+- tracker.py
+
