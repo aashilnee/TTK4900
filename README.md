@@ -1,9 +1,7 @@
 # TTK4900: Behavioural monitoring of salmon juveniles using stereo vision and machine learning
 
-
-## Project Thesis
-#### Annotator
-- Annotation tool for stereo images
+### Developing dataset of stereo images
+ - annotator.py
 
 #### Dataset
 - 1000 stereo image pairs
